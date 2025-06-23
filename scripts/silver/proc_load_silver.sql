@@ -163,9 +163,9 @@ BEGIN
         CASE WHEN bdate > GETDATE() THEN NULL
             ELSE bdate
         END AS bdate,
-        CASE WHEN UPPER(TRIM(gen)) IN ('F', 'FEMALE') THEN 'Female'
-            WHEN UPPER(TRIM(gen)) IN ('M', 'MALE') THEN 'Male'
-            ELSE 'n/a'
+        CASE WHEN UPPER(TRIM(gen)) IN ('F'+CHAR(13), 'FEMALE'+CHAR(13),'F','FEMALE') THEN 'Female'
+             WHEN UPPER(TRIM(gen)) IN ('M'+CHAR(13), 'MALE'+CHAR(13),'M','MALE') THEN 'Male'
+             ELSE 'n/a'
         END AS gen
         FROM bronze.erp_cust_az12
         SET @end_time = GETDATE();
@@ -179,9 +179,14 @@ BEGIN
         INSERT INTO silver.erp_loc_a101 (cid, cntry)
         SELECT
         REPLACE(cid, '-', '') cid,
-        CASE WHEN TRIM(cntry) = 'DE' THEN 'Germany'
-            WHEN TRIM(cntry) IN ('US', 'USA') THEN 'United States'
+        CASE WHEN TRIM(cntry) IN ('DE'+Char(13), 'Germany'+CHAR(13)) THEN 'Germany'
+            WHEN TRIM(cntry) = 'France'+CHAR(13) THEN 'France'
+            WHEN TRIM(cntry) = 'Canada'+CHAR(13) THEN 'Canada'
+            WHEN TRIM(cntry) = 'United Kingdom'+CHAR(13) THEN 'United Kingdom'
+            WHEN TRIM(cntry) IN ('US', 'USA','US'+CHAR(13), 'USA'+CHAR(13),'United States'+CHAR(13)) THEN 'United States'
             WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'
+            WHEN TRIM(cntry) = CHAR(13) THEN 'n/a'
+            WHEN TRIM(cntry) IN ('Australia'+CHAR(13)) THEN 'Australia'
             ELSE TRIM(cntry)
         END AS cntry
         FROM bronze.erp_loc_a101
